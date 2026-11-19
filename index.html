@@ -183,12 +183,12 @@ footer a{color:var(--bone)}
 .play.g:not(.f) .front{border-width:2px;animation:cardGlow 2.6s ease-in-out infinite}
 @keyframes cardGlow{0%,100%{border-color:rgba(var(--rgb),.6);box-shadow:0 0 6px rgba(var(--rgb),.3),inset 0 0 6px rgba(var(--rgb),.15)}50%{border-color:var(--ac);box-shadow:0 0 22px rgba(var(--rgb),.8),inset 0 0 14px rgba(var(--rgb),.35)}}
 .play.g:nth-child(3n+2) .front{animation-delay:-.9s}.play.g:nth-child(3n) .front{animation-delay:-1.8s}
-.rlb{animation:rlbGlow 2.4s ease-in-out infinite}
+
 @keyframes rlbGlow{0%,100%{box-shadow:0 0 0 rgba(255,255,255,0)}50%{box-shadow:0 0 12px var(--ac)}}
 .stats div{min-width:0;overflow:hidden}
 .stats b{font-size:clamp(.95rem,5.4vw,1.35rem);white-space:nowrap;letter-spacing:-.01em}
 @media (max-width:520px){.stats .wide{flex:1 1 100%}.stats div:not(.wide){flex:1 1 calc(50% - 6px)}}
-@media (prefers-reduced-motion:reduce){.play.g:not(.f) .front,.rlb{animation:none!important}.play.g:not(.f) .front{box-shadow:0 0 14px rgba(var(--rgb),.6)}}
+@media (prefers-reduced-motion:reduce){.play.g .in::after{animation:none!important}.play.g:not(.f) .front{box-shadow:0 0 14px rgba(var(--rgb),.6)}}
 
 /* --- intro gate, sound, spotlight --- */
 #gate{position:fixed;inset:0;z-index:9999;background:radial-gradient(circle at 50% 45%,#2a0a10 0,#0a0507 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;transition:opacity .9s,transform .9s,visibility .9s;overflow:hidden;text-align:center;padding:20px}
@@ -271,6 +271,22 @@ body.go .logo-wrap{animation:assemble 1.4s cubic-bezier(.16,1,.3,1) both}
 #go.on{display:flex;animation:glitch 0.3s steps(2) infinite}
 #go small{font:400 .9rem Poppins,sans-serif;color:#d9c4c0;letter-spacing:.2em}
 #hero #shr,#hero .logo-wrap{pointer-events:auto}
+
+/* --- v-fix: flip peek, lag --- */
+.front{visibility:visible}
+.back{visibility:hidden;transition:visibility 0s linear .3s}
+.play.f .back{visibility:visible;transition-delay:0s}
+.play.f .front{visibility:hidden;transition:visibility 0s linear .3s}
+.play.g:not(.f) .front{animation:none;border-width:2px;border-color:rgba(var(--rgb),.85);box-shadow:0 0 12px rgba(var(--rgb),.4),inset 0 0 10px rgba(var(--rgb),.18)}
+.play.g .in::after{content:"";position:absolute;inset:0;border-radius:14px;pointer-events:none;box-shadow:0 0 24px 2px rgba(var(--rgb),.85),inset 0 0 16px rgba(var(--rgb),.4);opacity:.15;animation:glo 2.6s ease-in-out infinite;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.play.f .in::after{display:none}
+@keyframes glo{50%{opacity:1}}
+.play.rv{opacity:1;transform:none;transition:none}
+.play.rv:not(.show){opacity:0}
+.play.show{animation:deal2 .6s cubic-bezier(.2,.8,.3,1) backwards;will-change:transform,opacity}
+@keyframes deal2{from{opacity:0;transform:translate3d(0,46px,0) scale(.94)}}
+.play:nth-child(3n+2).show{animation-delay:.08s}.play:nth-child(3n).show{animation-delay:.16s}
+@media (max-width:700px){body.go .sky .win{animation:winOn .4s 1.4s forwards}}
 </style>
 </head>
 <body>
@@ -392,7 +408,7 @@ for(var k in v){var el=document.getElementById(k);if(el.textContent!==String(v[k
 tick(); setInterval(tick, 1000);
 
 // Cards flow in from all four sides as you scroll
-var cv=document.getElementById("cv"),c=cv.getContext("2d"),W,H,cards=[],flow=0,t0=null,lastY=scrollY;
+var SB=innerWidth<700?0:12;var cv=document.getElementById("cv"),c=cv.getContext("2d"),W,H,cards=[],flow=0,t0=null,lastY=scrollY;
 var suits=["♠","♥","♣","♦"],still=matchMedia("(prefers-reduced-motion:reduce)").matches;
 function size(){W=cv.width=innerWidth;H=cv.height=innerHeight}
 size();addEventListener("resize",size);
@@ -405,7 +421,7 @@ function pos(a,p){var e=-.12+1.24*p,d=(p-.5)*.3,x,y;
 if(a.side==0){x=e;y=a.l+d}else if(a.side==1){x=1-e;y=a.l-d}else if(a.side==2){y=e;x=a.l+d}else{y=1-e;x=a.l-d}
 return[x*W,y*H]}
 function frame(t){if(document.hidden&&!still){requestAnimationFrame(frame);return}c.clearRect(0,0,W,H);var base=still?0:t/90000;
-c.save();c.shadowColor="#ff3b46";c.shadowBlur=12;c.lineWidth=1.4;
+c.save();c.shadowColor="#ff3b46";c.shadowBlur=SB;c.lineWidth=1.4;
 for(var L=0;L<3;L++){var u=((t/14000+L/3+flow*.15)%1),x=u*(W+H*.7)-H*.2,g=c.createLinearGradient(x,0,x-H*.6,H);
 g.addColorStop(0,"rgba(255,59,70,0)");g.addColorStop(.5,"rgba(255,59,70,.35)");g.addColorStop(1,"rgba(255,59,70,0)");
 c.strokeStyle=g;c.beginPath();c.moveTo(x,0);c.lineTo(x-H*.6,H);c.stroke()}
@@ -413,7 +429,7 @@ c.restore();
 if(t0===null)t0=t;var dl=still?1:Math.min(1,(t-t0)/1800),e=1-Math.pow(1-dl,3);
 cards.forEach(function(a){var p=((a.o+(base+flow)*a.sp)%1+1)%1,q=pos(a,p),w=30*a.s,h=42*a.s;q=[W/2+(q[0]-W/2)*e,H*.4+(q[1]-H*.4)*e];
 c.save();c.translate(q[0],q[1]);c.rotate(a.r+p*2*(a.k%2?1:-1));
-c.globalAlpha=.3*(.25+.75*e);c.fillStyle="#c4c8d0";c.shadowColor="#ff3b46";c.shadowBlur=12;
+c.globalAlpha=.3*(.25+.75*e);c.fillStyle="#c4c8d0";c.shadowColor="#ff3b46";c.shadowBlur=SB;if(!SB){var ga=c.globalAlpha;c.globalAlpha=ga*.4;c.fillStyle="#ff3b46";c.fillRect(-w/2-7,-h/2-7,w+14,h+14);c.globalAlpha=ga*.6;c.fillRect(-w/2-3.5,-h/2-3.5,w+7,h+7);c.globalAlpha=ga;c.fillStyle="#c4c8d0"}
 c.beginPath();c.rect(-w/2,-h/2,w,h);c.fill();c.shadowBlur=0;
 c.fillStyle=a.k%2?"#c4161f":"#12080a";c.font=(18*a.s)+"px serif";c.textAlign="center";c.textBaseline="middle";c.fillText(suits[a.k],0,0);c.restore()});
 if(!still)requestAnimationFrame(frame)}
@@ -483,18 +499,18 @@ var fbb=document.getElementById("fbbtn");
 if(FEEDBACK_URL){fbb.removeAttribute("data-wa");fbb.href=FEEDBACK_URL;fbb.target="_blank";fbb.rel="noopener"}
 document.querySelectorAll("[data-wa]").forEach(function(a){a.href="https://wa.me/"+(a.dataset.num||WA)+"?text="+encodeURIComponent(a.dataset.wa);a.target="_blank";a.rel="noopener"});
 
-// --- Intro gate + music + sfx + spotlight ---
+// --- Intro gate + music + spotlight ---
 (function(){
 var au=new Audio("ekta-borderland.mp3");au.loop=true;au.preload="auto";au.volume=0;var on=false,AC=null;
 var g=document.createElement("div");g.id="gate";g.innerHTML='<div class="fan"><i>♠</i><i>♥</i><i>♣</i><i>♦</i></div><h1>EKTA’26</h1><p>Welcome to the game</p><button type="button">ENTER THE GAME</button><small>Eleven games · One day · Best with sound on</small>';document.body.appendChild(g);document.documentElement.style.overflow="hidden";
 var sb=document.createElement("button");sb.id="snd";sb.type="button";sb.className="mute";sb.setAttribute("aria-label","Toggle music");sb.innerHTML="<b></b><b></b><b></b><b></b>";sb.style.display="none";document.body.appendChild(sb);
-function fade(to){var iv=setInterval(function(){var v=au.volume+(to>au.volume?.03:-.03);if((to>au.volume&&v>=to)||(to<au.volume&&v<=to)){au.volume=to;clearInterval(iv);if(to===0)au.pause()}else au.volume=Math.max(0,Math.min(1,v))},60)}
-function play(){on=true;sb.classList.remove("mute");au.play().then(function(){fade(.5)}).catch(function(){on=false;sb.classList.add("mute")})}
-function stop(){on=false;sb.classList.add("mute");fade(0)}
+function play(){on=true;sb.classList.remove("mute");try{au.volume=.5}catch(e){}var pr=au.play();if(pr&&pr.catch)pr.catch(function(){on=false;sb.classList.add("mute")})}
+function stop(){on=false;sb.classList.add("mute");au.pause()}
 sb.addEventListener("click",function(){on?stop():play()});
-document.addEventListener("visibilitychange",function(){if(document.hidden&&on){au.pause()}else if(on){au.play()}});
-var fl=new Audio("flip.mp3");fl.preload="auto";function sfx(){if(!on)return;try{var a=fl.cloneNode();a.volume=.75;a.play()}catch(e){}}
-document.addEventListener("click",function(e){if(e.target.closest&&e.target.closest(".play")&&!e.target.closest("a,button"))sfx()},true);
+function hideA(){au.pause()}function showA(){if(on){var pr=au.play();if(pr&&pr.catch)pr.catch(function(){})}}
+document.addEventListener("visibilitychange",function(){document.hidden?hideA():showA()});addEventListener("pagehide",hideA);addEventListener("pageshow",function(e){if(e.persisted)showA()});
+
+
 function burst(x,y){var S=["♠","♥","♣","♦"];for(var i=0;i<26;i++){var e=document.createElement("span");e.className="burst";e.textContent=S[i%4];e.style.left=x+"px";e.style.top=y+"px";e.style.color=i%2?"#ff3b46":"#e8eaf0";var a=Math.random()*6.28,r=120+Math.random()*260;e.style.setProperty("--dx",Math.cos(a)*r+"px");e.style.setProperty("--dy",Math.sin(a)*r+"px");e.style.setProperty("--rt",(Math.random()*720-360)+"deg");document.body.appendChild(e);setTimeout(function(el){el.remove()},1500,e)}}
 g.querySelector("button").addEventListener("click",function(e){var r=this.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2);play();sb.style.display="flex";var h=g.querySelector("h1");["fan","button","small","p"].forEach(function(q){var x=g.querySelector(q.charAt(0)==="f"?".fan":q);if(x)x.style.opacity=0});
 var seq=["3","2","1","GAME START"],k=0;function step(){h.textContent=seq[k];h.style.fontSize=k<3?"clamp(6.5rem,40vw,11rem)":"";h.classList.remove("sl");void h.offsetWidth;h.classList.add("sl");k++;if(k<seq.length)setTimeout(step,k<3?520:520);else setTimeout(function(){document.body.classList.add("go");g.classList.add("out");document.documentElement.style.overflow="";setTimeout(function(){g.remove()},1000)},750)}step()});
