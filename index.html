@@ -189,6 +189,49 @@ footer a{color:var(--bone)}
 .stats b{font-size:clamp(.95rem,5.4vw,1.35rem);white-space:nowrap;letter-spacing:-.01em}
 @media (max-width:520px){.stats .wide{flex:1 1 100%}.stats div:not(.wide){flex:1 1 calc(50% - 6px)}}
 @media (prefers-reduced-motion:reduce){.play.g:not(.f) .front,.rlb{animation:none!important}.play.g:not(.f) .front{box-shadow:0 0 14px rgba(var(--rgb),.6)}}
+
+/* --- intro gate, sound, spotlight --- */
+#gate{position:fixed;inset:0;z-index:9999;background:radial-gradient(circle at 50% 45%,#2a0a10 0,#0a0507 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;transition:opacity .9s,transform .9s,visibility .9s;overflow:hidden;text-align:center;padding:20px}
+#gate.out{opacity:0;transform:scale(1.25);visibility:hidden}
+#gate .fan{position:relative;width:200px;height:150px}
+#gate .fan i{position:absolute;left:50%;top:0;width:80px;height:114px;margin-left:-40px;border-radius:10px;background:linear-gradient(145deg,#e8eaf0,#9aa0ab);box-shadow:0 0 22px #ff3b46aa;display:flex;align-items:center;justify-content:center;font:700 2.2rem serif;font-style:normal;color:#12080a;transform-origin:50% 130%;animation:fan 1.6s cubic-bezier(.2,.9,.3,1.2) both,bob 3s 1.6s ease-in-out infinite}
+#gate .fan i:nth-child(2),#gate .fan i:nth-child(3){color:#c4161f}
+#gate .fan i:nth-child(1){--r:-30deg}#gate .fan i:nth-child(2){--r:-10deg;animation-delay:.15s,1.75s}#gate .fan i:nth-child(3){--r:10deg;animation-delay:.3s,1.9s}#gate .fan i:nth-child(4){--r:30deg;animation-delay:.45s,2s}
+@keyframes fan{from{transform:translateY(80px) rotate(0) scale(.4);opacity:0}to{transform:rotate(var(--r)) translateY(0) scale(1);opacity:1}}
+@keyframes bob{0%,100%{transform:rotate(var(--r)) translateY(0)}50%{transform:rotate(var(--r)) translateY(-8px)}}
+#gate h1{font:800 clamp(2.2rem,11vw,4.2rem) Unbounded,sans-serif;margin:0;color:#fff;letter-spacing:.04em;text-shadow:0 0 18px #ff3b46,0 0 42px #ff3b4688;animation:glitch 3.2s infinite}
+@keyframes glitch{0%,92%,100%{transform:none}94%{transform:translate(3px,-2px) skewX(6deg)}96%{transform:translate(-3px,2px) skewX(-6deg)}}
+#gate p{margin:0;color:#c9ccd4;font:400 .85rem Poppins,sans-serif;letter-spacing:.3em;text-transform:uppercase}
+#gate button{font:700 .95rem Poppins,sans-serif;letter-spacing:.14em;color:#fff;background:#c4161f;border:0;border-radius:999px;padding:15px 34px;cursor:pointer;animation:navGlow 1.8s ease-in-out infinite}
+#gate small{color:#8d919b;font:400 .72rem Poppins,sans-serif}
+.burst{position:fixed;z-index:10000;pointer-events:none;font:700 1.6rem serif;animation:burst 1.4s ease-out forwards}
+@keyframes burst{to{transform:translate(var(--dx),var(--dy)) rotate(var(--rt));opacity:0}}
+#snd{position:fixed;left:14px;bottom:14px;z-index:60;width:46px;height:46px;border-radius:50%;border:1px solid var(--glow);background:#12080ccc;backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:0;box-shadow:0 0 14px #ff3b4655}
+#snd b{width:3px;height:6px;background:#ff3b46;border-radius:2px;animation:eq .9s ease-in-out infinite}
+#snd b:nth-child(2){animation-delay:.2s}#snd b:nth-child(3){animation-delay:.4s}#snd b:nth-child(4){animation-delay:.1s}
+#snd.mute b{animation:none;height:3px;opacity:.5}
+@keyframes eq{0%,100%{height:5px}50%{height:20px}}
+#spot{position:fixed;inset:0;pointer-events:none;z-index:2;background:radial-gradient(260px circle at var(--x,50%) var(--y,50%),#ff3b4620,transparent 70%);opacity:0;transition:opacity .4s}
+@media (prefers-reduced-motion:reduce){#gate .fan i,#gate h1,#gate button,#snd b{animation:none!important}}
+
+#gate{background:linear-gradient(#0a0507ee,#0a0507ee),repeating-linear-gradient(0deg,#ff3b4614 0 1px,transparent 1px 44px),repeating-linear-gradient(90deg,#ff3b4614 0 1px,transparent 1px 44px),radial-gradient(circle at 50% 45%,#2a0a10 0,#0a0507 70%)}
+#gate::after{content:"";position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(90deg,#000 0 6%,transparent 6% 8%,#000 8% 15%,transparent 15% 16%,#000 16% 22%,transparent 22% 25%,#000 25% 36%,transparent 36% 38%,#000 38% 44%,transparent 44% 46%,#000 46% 58%,transparent 58% 60%,#000 60% 66%,transparent 66% 69%,#000 69% 80%,transparent 80% 82%,#000 82% 100%);-webkit-mask:linear-gradient(transparent,#000 40%);mask:linear-gradient(transparent,#000 40%);opacity:.9;pointer-events:none}
+#gate h1{transition:letter-spacing .5s}
+
+/* --- final polish --- */
+#prog{position:fixed;top:0;left:0;height:3px;width:0;z-index:70;background:linear-gradient(90deg,#c4161f,#ff3b46,#fff);box-shadow:0 0 10px #ff3b46,0 0 20px #ff3b46;pointer-events:none}
+.play.show{animation:deal .85s cubic-bezier(.2,.9,.3,1.15) backwards}
+.play:nth-child(3n+2).show{animation-delay:.12s}.play:nth-child(3n).show{animation-delay:.24s}
+@keyframes deal{from{opacity:0;transform:translate(-40vw,-30px) rotate(-18deg) scale(.7)}}
+#cd #s.tk{animation:tick .45s ease-out}
+@keyframes tick{0%{text-shadow:3px 0 #00e5ff,-3px 0 #ff3b46;transform:translateY(-3px)}100%{text-shadow:none;transform:none}}
+.mq{overflow:hidden;white-space:nowrap;border-top:1px solid #ff3b4655;border-bottom:1px solid #ff3b4655;background:#ff3b460f;padding:11px 0;box-shadow:0 0 18px #ff3b4622}
+.mq div{display:inline-block;padding-left:100%;animation:mq 26s linear infinite;font:700 .8rem Unbounded,Poppins,sans-serif;letter-spacing:.28em;color:#ffb3b8;text-shadow:0 0 10px #ff3b46}
+.mq div span{margin:0 22px;color:#ff3b46}
+@keyframes mq{to{transform:translateX(-100%)}}
+.tapp{position:fixed;z-index:10000;pointer-events:none;font:700 1.3rem serif;animation:tapp .9s ease-out forwards}
+@keyframes tapp{to{transform:translate(var(--dx),-70px) rotate(var(--rt));opacity:0}}
+@media (prefers-reduced-motion:reduce){.play.show,.mq div,#cd #s.tk{animation:none!important}}
 </style>
 </head>
 <body>
@@ -204,6 +247,7 @@ footer a{color:var(--bone)}
 <a class="btn" href="#reg">Join the game</a>
 </header>
 
+<div class="mq" aria-hidden="true"><div>ELEVEN GAMES<span>♠</span>ONE DAY<span>♥</span>14 JAN 2027<span>♣</span>M.A.M.O. COLLEGE<span>♦</span>ARE YOU IN?<span>♠</span>ELEVEN GAMES<span>♥</span>ONE DAY<span>♣</span>14 JAN 2027<span>♦</span>M.A.M.O. COLLEGE<span>♠</span>ARE YOU IN?<span>♥</span></div></div>
 <section id="about">
 <h2>You’ve been dealt in.</h2>
 <p>EKTA’26 is a management and cultural fest by the Departments of Commerce, Advertising &amp; Sales Management, and Management Studies at M.A.M.O. College. Management contests, creative challenges, gaming, performances and live music, all built around a card-game world where every round tests how you think and lead.</p>
@@ -399,6 +443,30 @@ var FEEDBACK_URL="";
 var fbb=document.getElementById("fbbtn");
 if(FEEDBACK_URL){fbb.removeAttribute("data-wa");fbb.href=FEEDBACK_URL;fbb.target="_blank";fbb.rel="noopener"}
 document.querySelectorAll("[data-wa]").forEach(function(a){a.href="https://wa.me/"+(a.dataset.num||WA)+"?text="+encodeURIComponent(a.dataset.wa);a.target="_blank";a.rel="noopener"});
+
+// --- Intro gate + music + sfx + spotlight ---
+(function(){
+var au=new Audio("ekta-borderland.mp3");au.loop=true;au.preload="auto";au.volume=0;var on=false,AC=null;
+var g=document.createElement("div");g.id="gate";g.innerHTML='<div class="fan"><i>♠</i><i>♥</i><i>♣</i><i>♦</i></div><h1>EKTA’26</h1><p>Welcome to the game</p><button type="button">ENTER THE GAME</button><small>Eleven games · One day · Best with sound on</small>';document.body.appendChild(g);document.documentElement.style.overflow="hidden";
+var sb=document.createElement("button");sb.id="snd";sb.type="button";sb.className="mute";sb.setAttribute("aria-label","Toggle music");sb.innerHTML="<b></b><b></b><b></b><b></b>";sb.style.display="none";document.body.appendChild(sb);
+function fade(to){var iv=setInterval(function(){var v=au.volume+(to>au.volume?.03:-.03);if((to>au.volume&&v>=to)||(to<au.volume&&v<=to)){au.volume=to;clearInterval(iv);if(to===0)au.pause()}else au.volume=Math.max(0,Math.min(1,v))},60)}
+function play(){on=true;sb.classList.remove("mute");au.play().then(function(){fade(.5)}).catch(function(){on=false;sb.classList.add("mute")})}
+function stop(){on=false;sb.classList.add("mute");fade(0)}
+sb.addEventListener("click",function(){on?stop():play()});
+document.addEventListener("visibilitychange",function(){if(document.hidden&&on){au.pause()}else if(on){au.play()}});
+function sfx(){if(!on)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();var n=AC.sampleRate*.18,b=AC.createBuffer(1,n,AC.sampleRate),d=b.getChannelData(0);for(var i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2.5);
+var s=AC.createBufferSource();s.buffer=b;var f=AC.createBiquadFilter();f.type="bandpass";f.frequency.setValueAtTime(1200,AC.currentTime);f.frequency.exponentialRampToValueAtTime(5000,AC.currentTime+.16);var v=AC.createGain();v.gain.value=.5;s.connect(f);f.connect(v);v.connect(AC.destination);s.start()}catch(e){}}
+document.addEventListener("click",function(e){if(e.target.closest&&e.target.closest(".play")&&!e.target.closest("a,button"))sfx()},true);
+function burst(x,y){var S=["♠","♥","♣","♦"];for(var i=0;i<26;i++){var e=document.createElement("span");e.className="burst";e.textContent=S[i%4];e.style.left=x+"px";e.style.top=y+"px";e.style.color=i%2?"#ff3b46":"#e8eaf0";var a=Math.random()*6.28,r=120+Math.random()*260;e.style.setProperty("--dx",Math.cos(a)*r+"px");e.style.setProperty("--dy",Math.sin(a)*r+"px");e.style.setProperty("--rt",(Math.random()*720-360)+"deg");document.body.appendChild(e);setTimeout(function(el){el.remove()},1500,e)}}
+g.querySelector("button").addEventListener("click",function(e){var r=this.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2);play();sb.style.display="flex";g.querySelector("h1").textContent="GAME START";g.querySelector("p").style.opacity=0;setTimeout(function(){g.classList.add("out");document.documentElement.style.overflow="";setTimeout(function(){g.remove()},1000)},900)});
+if(matchMedia("(pointer:fine)").matches){var sp=document.createElement("div");sp.id="spot";document.body.appendChild(sp);addEventListener("pointermove",function(e){sp.style.setProperty("--x",e.clientX+"px");sp.style.setProperty("--y",e.clientY+"px");sp.style.opacity=1},{passive:true})}
+})();
+
+// --- final polish: progress bar, tick glitch, tap suits ---
+(function(){var pb=document.createElement("div");pb.id="prog";document.body.appendChild(pb);
+function pr(){var h=document.documentElement.scrollHeight-innerHeight;pb.style.width=(h>0?scrollY/h*100:0)+"%"}addEventListener("scroll",pr,{passive:true});pr();
+var sc=document.getElementById("s");if(sc&&window.MutationObserver){new MutationObserver(function(){sc.classList.remove("tk");void sc.offsetWidth;sc.classList.add("tk")}).observe(sc,{childList:true,characterData:true,subtree:true})}
+var S=["♠","♥","♣","♦"];addEventListener("pointerdown",function(e){if(document.getElementById("gate"))return;for(var i=0;i<4;i++){var t=document.createElement("span");t.className="tapp";t.textContent=S[(Math.random()*4)|0];t.style.left=e.clientX+"px";t.style.top=e.clientY+"px";t.style.color=Math.random()>.5?"#ff3b46":"#e8eaf0";t.style.setProperty("--dx",(Math.random()*90-45)+"px");t.style.setProperty("--rt",(Math.random()*180-90)+"deg");document.body.appendChild(t);setTimeout(function(el){el.remove()},950,t)}},{passive:true})})();
 </script>
 </body>
 </html>
